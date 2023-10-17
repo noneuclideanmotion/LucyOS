@@ -1,6 +1,6 @@
-/backup
-/.vscode
-/logs
-/tools
-/build
+backup/
+.vscode/
+logs/
+tools/
+build/
 todo
