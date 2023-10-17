@@ -1,0 +1,283 @@
+const char* scancode_to_name_string(uint8_t key_code, keyboard::ps2::scan_set scan_set = keyboard::ps2::scan_set::SCAN_SET_ONE)
+				{
+					switch(key) {
+					case 0x0B:
+						return "ZERO PRESSED";
+					case 0x8b:
+						return "ZERO RELEASED";
+					case 0x02:
+						return "ONE PRESSED";
+					case 0x82:
+						return "ONE RELEASED";
+					case 0x03:
+						return "TWO PRESSED";
+					case 0x83:
+						return "TWO RELEASED";
+					case 0x04:
+						return "THREE PRESSED";
+					case 0x84:
+						return "THREE RELEASED";
+					case 0x05:
+						return "FOUR PRESSED";
+					case 0x85:
+						return "FOUR RELEASED";
+					case 0x06:
+						return "FIVE PRESSED";
+					case 0x86:
+						return "FIVE RELEASED";
+					case 0x07:
+						return "SIX PRESSED";
+					case 0x87:
+						return "SIX RELEASED";
+					case 0x08:
+						return "SEVEN PRESSED";
+					case 0x88:
+						return "SEVEN RELEASED";
+					case 0x09:
+						return "EIGHT PRESSED";
+					case 0x89:
+						return "EIGHT RELEASED";
+					case 0x0A:
+						return "NINE PRESSED";
+					case 0x8a:
+						return "NINE RELEASED";
+					case 0x1E:
+						return "A PRESSED";
+					case 0x9e:
+						return "A RELEASED";
+					case 0x30:
+						return "B PRESSED";
+					case 0xb0:
+						return "B RELEASED";
+					case 0x2E:
+						return "C PRESSED";
+					case 0xae:
+						return "C RELEASED";
+					case 0x20:
+						return "D PRESSED";
+					case 0xa0:
+						return "D RELEASED";
+					case 0x12:
+						return "E PRESSED";
+					case 0x92:
+						return "E RELEASED";
+					case 0x21:
+						return "F PRESSED";
+					case 0xa1:
+						return "F RELEASED";
+					case 0x22:
+						return "G PRESSED";
+					case 0xa2:
+						return "G RELEASED";
+					case 0x23:
+						return "H PRESSED";
+					case 0xa3:
+						return "H RELEASED";
+					case 0x17:
+						return "I PRESSED";
+					case 0x97:
+						return "I RELEASED";
+					case 0x24:
+						return "J PRESSED";
+					case 0xa4:
+						return "J RELEASED";
+					case 0x25:
+						return "K PRESSED";
+					case 0xa5:
+						return "K RELEASED";
+					case 0x26:
+						return "L PRESSED";
+					case 0xa6:
+						return "L RELEASED";
+					case 0x32:
+						return "M PRESSED";
+					case 0xb2:
+						return "M RELEASED";
+					case 0x31:
+						return "N PRESSED";
+					case 0xb1:
+						return "N RELEASED";
+					case 0x18:
+						return "O PRESSED";
+					case 0x98:
+						return "O RELEASED";
+					case 0x19:
+						return "P PRESSED";
+					case 0x99:
+						return "P RELEASED";
+					case 0x10:
+						return "Q PRESSED";
+					case 0x90:
+						return "Q RELEASED";
+					case 0x13:
+						return "R PRESSED";
+					case 0x93:
+						return "R RELEASED";
+					case 0x1F:
+						return "S PRESSED";
+					case 0x9f:
+						return "S RELEASED";
+					case 0x14:
+						return "T PRESSED";
+					case 0x94:
+						return "T RELEASED";
+					case 0x16:
+						return "U PRESSED";
+					case 0x96:
+						return "U RELEASED";
+					case 0x2F:
+						return "V PRESSED";
+					case 0xaf:
+						return "V RELEASED";
+					case 0x11:
+						return "W PRESSED";
+					case 0x91:
+						return "W RELEASED";
+					case 0x2D:
+						return "X PRESSED";
+					case 0xad:
+						return "X RELEASED";
+					case 0x15:
+						return "Y PRESSED";
+					case 0x95:
+						return "Y RELEASED";
+					case 0x2C:
+						return "Z PRESSED";
+					case 0xac:
+						return "Z RELEASED";
+					case 0x3B:
+						return "F1 PRESSED";
+					case 0xbb:
+						return "F1 RELEASED";
+					case 0x3C:
+						return "F2 PRESSED";
+					case 0xbc:
+						return "F2 RELEASED";
+					case 0x3D:
+						return "F3 PRESSED";
+					case 0xbd:
+						return "F3 RELEASED";
+					case 0x3E:
+						return "F4 PRESSED";
+					case 0xbe:
+						return "F4 RELEASED";
+					case 0x3F:
+						return "F5 PRESSED";
+					case 0xbf:
+						return "F5 RELEASED";
+					case 0x40:
+						return "F6 PRESSED";
+					case 0xc0:
+						return "F6 RELEASED";
+					case 0x41:
+						return "F7 PRESSED";
+					case 0xc1:
+						return "F7 RELEASED";
+					case 0x42:
+						return "F8 PRESSED";
+					case 0xc2:
+						return "F8 RELEASED";
+					case 0x43:
+						return "F9 PRESSED";
+					case 0xc3:
+						return "F9 RELEASED";
+					case 0x44:
+						return "F10 PRESSED";
+					case 0xc4:
+						return "F10 RELEASED";
+					case 0x57:
+						return "F11 PRESSED";
+					case 0xd7:
+						return "F11 RELEASED";
+					case 0x58:
+						return "F12 PRESSED";
+					case 0xd8:
+						return "F12 RELEASED";
+					case 0x29:
+						return "GRAVE PRESSED";
+					case 0xa9:
+						return "GRAVE RELEASED";
+					case 0x0C:
+						return "MINUS PRESSED";
+					case 0x8c:
+						return "MINUS RELEASED";
+					case 0x0D:
+						return "EQUALS PRESSED";
+					case 0x8d:
+						return "EQUALS RELEASED";
+					case 0x1A:
+						return "LEFT_SQUARE_BRACKET PRESSED";
+					case 0x9a:
+						return "LEFT_SQUARE_BRACKET RELEASED";
+					case 0x1B:
+						return "RIGHT_SQUARE_BRACKET PRESSED";
+					case 0x9b:
+						return "RIGHT_SQUARE_BRACKET RELEASED";
+					case 0x2B:
+						return "BACK_SLASH PRESSED";
+					case 0xab:
+						return "BACK_SLASH RELEASED";
+					case 0x27:
+						return "SEMICOLON PRESSED";
+					case 0xa7:
+						return "SEMICOLON RELEASED";
+					case 0x28:
+						return "SINGLE_QUOTE PRESSED";
+					case 0xa8:
+						return "SINGLE_QUOTE RELEASED";
+					case 0x33:
+						return "COMMA PRESSED";
+					case 0xb3:
+						return "COMMA RELEASED";
+					case 0x34:
+						return "FULL_STOP PRESSED";
+					case 0xb4:
+						return "FULL_STOP RELEASED";
+					case 0x35:
+						return "FORWARD_SLASH PRESSED";
+					case 0xb5:
+						return "FORWARD_SLASH RELEASED";
+					case 0x01:
+						return "ESCAPE PRESSED";
+					case 0x81:
+						return "ESCAPE RELEASED";
+					case 0x39:
+						return "SPACE PRESSED";
+					case 0xb9:
+						return "SPACE RELEASED";
+					case 0x0E:
+						return "BACKSPACE PRESSED";
+					case 0x8e:
+						return "BACKSPACE RELEASED";
+					case 0x0F:
+						return "TAB PRESSED";
+					case 0x8f:
+						return "TAB RELEASED";
+					case 0x3A:
+						return "CAPS_LOCK PRESSED";
+					case 0xba:
+						return "CAPS_LOCK RELEASED";
+					case 0x2A:
+						return "LEFT_SHIFT PRESSED";
+					case 0xaa:
+						return "LEFT_SHIFT RELEASED";
+					case 0x36:
+						return "RIGHT_SHIFT PRESSED";
+					case 0xb6:
+						return "RIGHT_SHIFT RELEASED";
+					case 0x1C:
+						return "ENTER PRESSED";
+					case 0x9c:
+						return "ENTER RELEASED";
+					case 0x1D:
+						return "CTRL PRESSED";
+					case 0x9d:
+						return "CTRL RELEASED";
+					case 0x38:
+						return "ALT PRESSED";
+					case 0xb8:
+						return "ALT RELEASED";
+					default:
+						return "UNKOWN";
+				};
+			}
