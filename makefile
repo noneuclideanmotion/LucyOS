@@ -22,30 +22,37 @@
 
 
 #==============================================#
+# 
+#==============================================#
+
+	
+
+
+#==============================================#
 # Programs and their flags
 #==============================================#
 
 	GNU_AS					:= i686-elf-
 	ASSEMBLER 				:= nasm
-	ASSEMBLER_FLAGS 		:= -Wall -f elf32
+	ASSEMBLER_FLAGS 		:= -Wall -f elf64
 
-	C_COMPILER 				:= i686-elf-gcc
-	C_COMPILER_FLAGS 		:= -I $(DIR_SRC) -c -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -B $(DIR_GNU_AS)/$(GNU_AS)
-	C_COMPILER_FLAGS_DBG 	:= -I $(DIR_SRC) -g -c -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -B $(DIR_GNU_AS)/$(GNU_AS)
-	C_COMPILER_FLAGS_LIB	:= -I $(DIR_LIB_SRC) -c -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -B $(DIR_GNU_AS)/$(GNU_AS)
+	C_COMPILER 				:= gcc
+	C_COMPILER_FLAGS 		:= -I $(DIR_SRC) -c -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti 
+	C_COMPILER_FLAGS_DBG 	:= -I $(DIR_SRC) -g -c -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti 
+	C_COMPILER_FLAGS_LIB	:= -I $(DIR_LIB_SRC) -c -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti
 
-	LINKER 					:= i686-elf-ld
-	LINKER_FLAGS 			:= -T $(DIR_SCRIPTS)/link.ld -m elf_i386
+	LINKER 					:= ld
+	LINKER_FLAGS 			:= -T $(DIR_SCRIPTS)/linker/kernel.ld -m elf_x86_64
 
 	
 #==============================================#
 # Output directories (when building)
 #==============================================#
 
-	DIR_BUILD_KERNEL_ELF 	:= $(DIR_BUILD)/elf
+	DIR_BUILD_KERNEL_ELF 	:= $(DIR_BUILD)/bin
 	DIR_BUILD_KERNEL_OBJ 	:= $(DIR_BUILD)/obj/kernel
 	DIR_BUILD_CRT_OBJ 		:= $(DIR_BUILD)/obj/platform/system-v
-	KERNEL_ELF_NAME			:= kernel.elf
+	KERNEL_ELF_NAME			:= kernel
 
 #==============================================#
 # Other variables
@@ -56,8 +63,8 @@
 	KERNEL_HPP_SOURCES		:= $(shell find "$(DIR_KERNEL)" -type f -name "*.hpp")
 	CRT_SOURCES				:= $(shell find "$(DIR_SYSTEMV)" -type f -name "*.asm")
 
-	CRTBEGIN_OBJ			:=$(shell $(DIR_COMPILER)/$(C_COMPILER) $(C_COMPILER_FLAGS) -print-file-name=crtbegin.o)
-	CRTEND_OBJ				:=$(shell $(DIR_COMPILER)/$(C_COMPILER) $(C_COMPILER_FLAGS) -print-file-name=crtend.o)
+	CRTBEGIN_OBJ			:=$(shell $(C_COMPILER) $(C_COMPILER_FLAGS) -print-file-name=crtbegin.o)
+	CRTEND_OBJ				:=$(shell $(C_COMPILER) $(C_COMPILER_FLAGS) -print-file-name=crtend.o)
 
 	DEBUG					:= true
 
@@ -265,13 +272,13 @@ kernel_compile_cpp:
 
 ifeq (${DEBUG},false)
 		$(foreach source, $(KERNEL_CPP_SOURCES), 									 						\
-		$(DIR_COMPILER)/$(C_COMPILER) $(C_COMPILER_FLAGS) $(source)											\
+		$(C_COMPILER) $(C_COMPILER_FLAGS) $(source)											\
 		-o $(DIR_BUILD_KERNEL_OBJ)/$(shell basename -s .asm $(subst /,_, $(subst ./,, $(source)))).o;		\
 																											\
 		)
 else
 		$(foreach source, $(KERNEL_CPP_SOURCES), 									 						\
-		$(DIR_COMPILER)/$(C_COMPILER) $(C_COMPILER_FLAGS_DBG) $(source)											\
+		$(C_COMPILER) $(C_COMPILER_FLAGS_DBG) $(source)											\
 		-o $(DIR_BUILD_KERNEL_OBJ)/$(shell basename -s .asm $(subst /,_, $(subst ./,, $(source)))).o;		\
 																											\
 		)
@@ -286,34 +293,23 @@ endif
 #)
 kernel_link: 		clean kernel_assemble kernel_compile_cpp
 #ld -T link.ld -melf_i386 loader.o -o kernel.elf
-	@mkdir -p $(DIR_BUILD)/elf
+	@mkdir -p $(DIR_BUILD_KERNEL_ELF)
 	$(eval KERNEL_OBJ_FILES=$(shell find "$(DIR_BUILD_KERNEL_OBJ)" -type f -name "*.o"))
 	$(eval CRTI_OBJ=$(shell find $(DIR_BUILD_CRT_OBJ) -type f -name "crti.o"))
 	$(eval CRTN_OBJ=$(shell find $(DIR_BUILD_CRT_OBJ) -type f -name "crtn.o"))
 	echo $(KERNEL_OBJ_FILES)
 
-	$(DIR_LINKER)/$(LINKER) $(LINKER_FLAGS) $(CRTI_OBJ) $(CRTBEGIN_OBJ) $(KERNEL_OBJ_FILES) $(CRTEND_OBJ) $(CRTN_OBJ) -o $(DIR_BUILD_KERNEL_ELF)/$(KERNEL_ELF_NAME)
-kernel_iso: 		kernel_assemble kernel_link
-	mkdir -p 										$(DIR_BUILD)/ISO/boot/grub
-	cp $(DIR_BOOTLOADER) 							$(DIR_BUILD)/ISO/boot/grub
-	cp $(DIR_CONFIG)/grub/menu.lst					$(DIR_BUILD)/ISO/boot/grub
-	cp $(DIR_BUILD_KERNEL_ELF)/$(KERNEL_ELF_NAME)	$(DIR_BUILD)/ISO/boot
-	genisoimage 															\
-							-R												\
-							-b boot/grub/stage2_eltorito					\
-							-no-emul-boot									\
-							-boot-load-size 4								\
-							-A $(OS_NAME)									\
-							-input-charset utf8								\
-							-boot-info-table								\
-							-o $(DIR_OUT)/ISO/$(OS_NAME).iso				\
-							$(DIR_BUILD)/ISO
+	$(LINKER) $(LINKER_FLAGS) $(KERNEL_OBJ_FILES) -o $(DIR_BUILD_KERNEL_ELF)/$(KERNEL_ELF_NAME)
 
-libk:
+kernel_iso: 		kernel_assemble kernel_link
+	
 
 
 clean:
 	rm -f -r ./build/
+	rm -f -r ./logs/
+	mkdir -p ./build
+	mkdir -p ./logs
 
 disassemble:
 	mkdir -p ./out/assembly
@@ -325,3 +321,7 @@ run:
 debug:
 	mkdir -p ./logs
 	qemu-system-x86_64 -monitor stdio -s -S -D ./logs/qemu-kernel.log -boot d -cdrom $(DIR_OUT)/iso/$(OS_NAME).iso
+
+
+binutils:
+	
