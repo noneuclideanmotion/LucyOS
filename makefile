@@ -18,7 +18,7 @@
 	DIR_SYSTEMV					:= $(DIR_PLATFORM)/system-v
 	DIR_LIB_SRC					:= $(DIR_SRC)/lib
 	DIR_KERNEL_HEADER			:= $(DIR_KERNEL)/include
-	DIR_BOOTLOADER				:= $(DIR_TOOLS)/grub/stage2_eltorito
+	DIR_BOOTLOADER				:= $(DIR_TOOLS)/limine
 
 
 #==============================================#
@@ -61,7 +61,7 @@
 	KERNEL_SOURCES		 	:= $(shell find "$(DIR_KERNEL)" -type f -name "*.asm")
 	KERNEL_CPP_SOURCES		:= $(shell find "$(DIR_KERNEL)" -type f -name "*.cpp")
 	KERNEL_HPP_SOURCES		:= $(shell find "$(DIR_KERNEL)" -type f -name "*.hpp")
-	CRT_SOURCES				:= $(shell find "$(DIR_SYSTEMV)" -type f -name "*.asm")
+#CRT_SOURCES				:= $(shell find "$(DIR_SYSTEMV)" -type f -name "*.asm")
 
 	CRTBEGIN_OBJ			:=$(shell $(C_COMPILER) $(C_COMPILER_FLAGS) -print-file-name=crtbegin.o)
 	CRTEND_OBJ				:=$(shell $(C_COMPILER) $(C_COMPILER_FLAGS) -print-file-name=crtend.o)
@@ -117,9 +117,9 @@ OBJFILENAMES := $(foreach dir,$(ASMFILES),"$(shell basename -s .asm $(dir)).o")
 
 BUILD_LIST := assemble
 
-all: kernel
+all: iso
 
-kernel: 			clean kernel_assemble kernel_link kernel_iso
+kernel: 			clean kernel_assemble kernel_link
 
 kernel_assemble:    clean
 
@@ -301,8 +301,29 @@ kernel_link: 		clean kernel_assemble kernel_compile_cpp
 
 	$(LINKER) $(LINKER_FLAGS) $(KERNEL_OBJ_FILES) -o $(DIR_BUILD_KERNEL_ELF)/$(KERNEL_ELF_NAME)
 
-kernel_iso: 		kernel_assemble kernel_link
-	
+limine: 
+#	mkdir -p $(DIR_BUILD)/limine
+#	$(eval LIMINE_BUILD=$(shell realpath $(DIR_BUILD)/limine))
+	cd $(DIR_BOOTLOADER) && ./configure --enable-bios-cd --enable-bios --enable-uefi-x86-64 --enable-uefi-cd --enable-uefi-ia32
+	cd $(DIR_BOOTLOADER) && make
+
+#Create and populate the virtual file system
+vfs: kernel
+	mkdir -p $(DIR_BUILD)/vfs/boot
+	mkdir -p $(DIR_BUILD)/vfs/boot/limine
+	mkdir -p $(DIR_BUILD)/vfs/EFI/BOOT
+	cp $(DIR_BUILD_KERNEL_ELF)/$(KERNEL_ELF_NAME) $(DIR_BUILD)/vfs/boot/kernel
+	cp $(DIR_CONFIG)/limine.cfg $(DIR_BOOTLOADER)/bin/limine-bios.sys $(DIR_BOOTLOADER)/bin/limine-bios-cd.bin $(DIR_BOOTLOADER)/bin/limine-uefi-cd.bin $(DIR_BUILD)/vfs/boot/limine
+	cp -v  $(DIR_BOOTLOADER)/bin/BOOTX64.EFI $(DIR_BUILD)/vfs/EFI/BOOT/
+	cp -v  $(DIR_BOOTLOADER)/bin/BOOTIA32.EFI $(DIR_BUILD)/vfs/EFI/BOOT/
+
+iso: vfs
+	$(eval ABS_VFS_PATH=$(shell realpath $(DIR_BUILD)/vfs))
+	xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
+    	-no-emul-boot -boot-load-size 4 -boot-info-table \
+    	--efi-boot boot/limine/limine-uefi-cd.bin \
+    	-efi-boot-part --efi-boot-image --protective-msdos-label \
+    	$(ABS_VFS_PATH) -o $(DIR_OUT)/LucyOS.iso
 
 
 clean:
@@ -316,12 +337,8 @@ disassemble:
 	g++ -S -fverbose-asm -ffreestanding -Wall -Wextra -fno-exceptions -fno-rtti -B /mnt/d/programming/os/tools/binutils/bin/bin/i686-elf- ./src/kernel/boot/main.cpp -o ./out/assembly/disassembled.s
 
 run:
-	qemu-system-x86_64 -boot d -cdrom $(DIR_OUT)/iso/$(OS_NAME).iso
+	qemu-system-x86_64 -boot d -cdrom $(DIR_OUT)/$(OS_NAME).iso
 
 debug:
 	mkdir -p ./logs
-	qemu-system-x86_64 -monitor stdio -s -S -D ./logs/qemu-kernel.log -boot d -cdrom $(DIR_OUT)/iso/$(OS_NAME).iso
-
-
-binutils:
-	
+	qemu-system-x86_64 -monitor stdio -s -S -D ./logs/qemu-kernel.log -boot d -cdrom $(DIR_OUT)/$(OS_NAME).iso
